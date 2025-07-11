@@ -1,0 +1,15 @@
+spring.application.name=analytics-service
+# application.properties for analytics-service
+
+server.port=8084
+
+# Register with Eureka
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+eureka.instance.prefer-ip-address=true
+
+# Feign client config
+spring.cloud.openfeign.client.config.default.connectTimeout=5000
+spring.cloud.openfeign.client.config.default.readTimeout=5000
+
+# Enable Actuator for health check
+management.endpoints.web.exposure.include=*

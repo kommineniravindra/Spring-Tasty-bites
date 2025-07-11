@@ -1,0 +1,40 @@
+package com.sathya.controller;
+
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/tracking")
+public class TrackingController {
+
+    private static final Map<Long, Map<String, Object>> orderTrackingData = new HashMap<>();
+
+    static {
+        Map<String, Object> order1 = new HashMap<>();
+        order1.put("status", "Out for Delivery");
+        order1.put("driverName", "Suresh Delivery");
+        order1.put("eta", 30);
+        order1.put("lat", 17.4065);
+        order1.put("lng", 78.4772);
+        orderTrackingData.put(1L, order1);
+
+        Map<String, Object> order101 = new HashMap<>();
+        order101.put("status", "Out for Delivery");
+        order101.put("driverName", "Ravi Kumar");
+        order101.put("eta", 25);
+        order101.put("lat", 17.385044);
+        order101.put("lng", 78.486671);
+        orderTrackingData.put(101L, order101);
+    }
+
+    @GetMapping("/{orderId}")
+    public Map<String, Object> getTracking(@PathVariable Long orderId) {
+        return orderTrackingData.getOrDefault(orderId, Map.of(
+            "status", "Unknown",
+            "driverName", "N/A",
+            "eta", 60,
+            "lat", null,
+            "lng", null
+        ));
+    }
+}

@@ -1,0 +1,32 @@
+spring.application.name=apigateway
+
+# ============================================
+# Server Configuration
+# ============================================
+server.port=8080
+
+
+# ============================================
+# Eureka Client (if using service discovery)
+# ============================================
+eureka.client.register-with-eureka=true
+eureka.client.fetch-registry=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+# ============================================
+# Gateway Configuration
+# ============================================
+spring.cloud.gateway.routes[0].id=auth-service
+spring.cloud.gateway.routes[0].uri=http://localhost:8081
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/auth/**
+
+spring.cloud.gateway.routes[1].id=product-service
+spring.cloud.gateway.routes[1].uri=http://localhost:8082
+spring.cloud.gateway.routes[1].predicates[0]=Path=/api/products/**
+
+# ============================================
+# (Optional) Logging for debugging routing
+# ============================================
+logging.level.org.springframework.cloud.gateway=DEBUG
+
+

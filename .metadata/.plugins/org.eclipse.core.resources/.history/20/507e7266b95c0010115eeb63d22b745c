@@ -1,0 +1,43 @@
+package com.sathya.controller;
+
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sathya.entity.LoginDetails;
+import com.sathya.util.JwtUtil;
+
+@RestController
+@RequestMapping("/api/auth")
+public class JwtController {
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginDetails loginDetails) {
+        // Simulated user verification
+        if (loginDetails.getUsername().equals("ratan") &&
+            loginDetails.getPassword().equals("Ratan@123")) {
+
+            String token = JwtUtil.generateToken(loginDetails.getUsername(), loginDetails.getRole());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header("token", "Token generated successfully...")
+                    .body(token);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header("token", "username & password fail...")
+                    .body("username & password fail...");
+        }
+    }
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody SignupRequest signupRequest) {
+        String result = userService.registerUser(signupRequest);
+        if (result.equals("User registered successfully")) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+}

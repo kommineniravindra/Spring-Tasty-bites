@@ -1,0 +1,17 @@
+package com.sathya.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.sathya.entity.Order;
+
+import feign.Param;
+
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    @Query("SELECT MAX(o.userOrderNumber) FROM Order o WHERE o.userId = :userId")
+    Integer findMaxUserOrderNumberByUserId(@Param("userId") Long userId);
+    List<Order> findByUserId(Long userId);
+}
+

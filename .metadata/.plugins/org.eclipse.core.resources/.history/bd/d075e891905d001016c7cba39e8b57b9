@@ -1,0 +1,36 @@
+package com.sathya.util;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+import java.security.Key;
+
+public class JwtUtil {
+
+    // ✅ This must match EXACTLY the secret used in auth-service JwtUtil
+    private static final String SECRET = "MySuperSecretKeyForJwtThatShouldBeLongEnough123456789";
+    private static final Key SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
+
+    public static String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    public static Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("userId", Long.class);
+    }
+
+    public static String extractRole(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("role", String.class);
+    }
+
+    private static Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token.replace("Bearer ", ""))
+                .getBody();
+    }
+}

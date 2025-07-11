@@ -1,0 +1,20 @@
+package com.sathya.controller;
+
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    @PostMapping("/place")
+    public ResponseEntity<?> placeOrder(@RequestBody OrderRequest request) {
+        return ResponseEntity.ok(orderService.placeOrder(request));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getOrdersByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+    }
+}
+

@@ -1,0 +1,10 @@
+package com.sathya.entity;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoginDetails {
+	private String username;
+	private String password;
+	private String role; // USER or ADMIN
+}

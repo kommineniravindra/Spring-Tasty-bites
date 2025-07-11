@@ -1,0 +1,53 @@
+package com.sathya.service;
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sathya.feign.OrderFeignClient;
+import com.sathya.model.AnalyticsResult;
+import com.sathya.model.OrderDTO;
+import com.sathya.model.OrderItemDTO;
+
+@Service
+public class AnalyticsService {
+
+    @Autowired
+    private OrderFeignClient orderFeignClient;
+
+    public Map<String, Object> getAnalytics() {
+        List<OrderDTO> orders = orderFeignClient.getAllOrders();
+        Map<String, Object> analytics = new HashMap<>();
+
+        double totalRevenue = 0;
+        int totalOrders = orders.size();
+        Map<String, Integer> productCountMap = new HashMap<>();
+
+        for (OrderDTO order : orders) {
+            totalRevenue += order.getTotalAmount();
+            for (OrderItemDTO item : order.getItems()) {
+                productCountMap.merge(item.getProductName(), item.getQuantity(), Integer::sum);
+            }
+        }
+
+        List<Map.Entry<String, Integer>> sortedTopItems = new ArrayList<>(productCountMap.entrySet());
+        sortedTopItems.sort((a, b) -> b.getValue() - a.getValue());
+
+        analytics.put("totalRevenue", totalRevenue);
+        analytics.put("totalOrders", totalOrders);
+        analytics.put("topSellingItems", sortedTopItems.stream().limit(5).toList());
+
+        return analytics;
+    }
+
+	public AnalyticsResult calculateAnalytics() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+

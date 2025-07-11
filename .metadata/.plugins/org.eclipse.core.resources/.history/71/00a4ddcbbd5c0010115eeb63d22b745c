@@ -1,0 +1,43 @@
+package com.sathya.controller;
+
+import com.sathya.dto.SignupRequest;
+import com.sathya.entity.LoginDetails;
+import com.sathya.entity.User;
+import com.sathya.service.UserService;
+import com.sathya.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+public class JwtController {
+
+    @Autowired
+    private UserService userService; 
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginDetails loginDetails) {
+        // 🔍 Validate from DB using real userService
+        User user = userService.validateUser(loginDetails.getUsername(), loginDetails.getPassword());
+
+        if (user != null) {
+            String token = JwtUtil.generateToken(user.getUsername(), user.getRole());
+            return ResponseEntity.ok(token);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }
+    }
+
+
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody SignupRequest signupRequest) {
+        String result = userService.registerUser(signupRequest); 
+        if (result.equals("User registered successfully")) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+}

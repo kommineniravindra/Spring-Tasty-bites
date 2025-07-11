@@ -1,0 +1,14 @@
+package com.sathya.feign;
+
+import com.foodorder.analytics.model.OrderDTO;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+
+@FeignClient(name = "order-service")
+public interface OrderFeignClient {
+
+    @GetMapping("/api/orders/all")
+    List<OrderDTO> getAllOrders();
+}

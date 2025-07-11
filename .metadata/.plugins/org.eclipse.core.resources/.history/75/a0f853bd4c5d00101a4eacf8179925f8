@@ -1,0 +1,52 @@
+package com.sathya.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sathya.dto.OrderRequest;
+import com.sathya.entity.Order;
+import com.sathya.entity.OrderItem;
+import com.sathya.feign.AuthClient;
+import com.sathya.repository.OrderRepository;
+
+@Service
+public class OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    AuthClient authClient;
+
+    public void placeOrder(OrderRequest request, String token) {
+        Long userId = authClient.extractUserId(token); // or decode from JWT manually
+
+        Order order = new Order();
+        order.setOrderDate(LocalDateTime.now());
+        order.setUserId(userId);
+        order.setTotalAmount(request.getTotalAmount());
+
+        List<OrderItem> items = request.getItems().stream().map(item -> {
+            OrderItem i = new OrderItem();
+            i.setProductName(item.getProductName());
+            i.setQuantity(item.getQuantity());
+            i.setPrice(item.getPrice());
+            i.setOrder(order);
+            return i;
+        }).collect(Collectors.toList());
+
+        order.setItems(items);
+
+        orderRepository.save(order); // saves both order and items if CascadeType.ALL
+    }
+
+
+    public List<Order> getOrdersByUser(Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+}
+

@@ -1,0 +1,51 @@
+package com.sathya.service;
+
+import com.sathya.feign.OrderFeignClient;
+import com.sathya.model.AnalyticsResult;
+import com.sathya.model.OrderDTO;
+import com.sathya.model.OrderItemDTO;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class AnalyticsService {
+
+    private final OrderFeignClient orderFeignClient;
+
+    public AnalyticsResult generateAnalyticsSummary() {
+        List<OrderDTO> orders = orderFeignClient.getAllOrders();
+
+        double totalRevenue = 0;
+        int totalOrders = orders.size();
+        Map<String, Integer> productSales = new HashMap<>();
+
+        for (OrderDTO order : orders) {
+            totalRevenue += order.getTotalAmount();
+            for (OrderItemDTO item : order.getItems()) {
+                productSales.put(
+                    item.getProductName(),
+                    productSales.getOrDefault(item.getProductName(), 0) + item.getQuantity()
+                );
+            }
+        }
+
+        // Top 3 selling items by quantity
+        List<String> topSellingItems = productSales.entrySet()
+                .stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return AnalyticsResult.builder()
+                .totalRevenue(totalRevenue)
+                .totalOrders(totalOrders)
+                .topSellingItems(topSellingItems)
+                .build();
+    }
+}

@@ -1,0 +1,33 @@
+package com.sathya.service;
+
+@Service
+public class OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    public Order placeOrder(OrderRequest request) {
+        Order order = new Order();
+        order.setUserId(request.getUserId());
+        order.setOrderDate(LocalDateTime.now());
+        order.setTotalAmount(request.getTotalAmount());
+
+        List<OrderItem> items = request.getCartItems().stream().map(item -> {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProductName(item.getProductName());
+            orderItem.setPrice(item.getPrice());
+            orderItem.setQuantity(item.getQuantity());
+            orderItem.setOrder(order);
+            return orderItem;
+        }).collect(Collectors.toList());
+
+        order.setItems(items);
+
+        return orderRepository.save(order);
+    }
+
+    public List<Order> getOrdersByUser(Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+}
+

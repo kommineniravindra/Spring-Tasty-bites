@@ -1,0 +1,9 @@
+package com.sathya.dto;
+
+@Data
+public class OrderRequest {
+    private Long userId;
+    private List<CartItem> cartItems;
+    private double totalAmount;
+}
+

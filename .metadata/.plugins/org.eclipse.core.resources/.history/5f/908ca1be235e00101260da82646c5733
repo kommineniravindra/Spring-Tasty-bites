@@ -1,0 +1,38 @@
+package com.sathya.controller;
+
+import com.sathya.dto.OrderRequest;
+import com.sathya.entity.Order;
+import com.sathya.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    @PostMapping("/place")
+    public ResponseEntity<String> placeOrder(@RequestBody OrderRequest orderRequest,
+                                             @RequestHeader("Authorization") String token) {
+        orderService.placeOrder(orderRequest, token);
+        return ResponseEntity.ok("Order placed successfully");
+    }
+
+    // ✅ Get orders of logged-in user using token
+    @GetMapping("/my")
+    public ResponseEntity<List<Order>> getMyOrders(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(orderService.getMyOrders(token));
+    }
+ // ✅ For analytics-service to fetch all orders
+    @GetMapping("/all")
+    public ResponseEntity<List<Order>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+
+}
